@@ -1,13 +1,13 @@
 package org.lucasimi.vptree;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.lucasimi.utils.BinaryTree;
 import org.lucasimi.utils.MaxHeap;
 import org.lucasimi.utils.Metric;
+import org.lucasimi.utils.Ordered;
 
 class VPKNNSearch<T> {
 
@@ -17,48 +17,45 @@ class VPKNNSearch<T> {
 
     private final Metric<T> metric;
 
-    private final MaxHeap<HeapNode> points;
-
-    private class HeapNode {
-
-        private double dist;
-
-        private T point;
-
-        public HeapNode(T point) {
-            this.point = point;
-            this.dist = metric.eval(point, center);
-        }
-
-    }
+    private final MaxHeap<Ordered<Double, T>> points;
 
     public VPKNNSearch(Metric<T> metric, T center, int neighbors, BinaryTree<VPNode<T>> tree) {
         this.center = center;
         this.neighbors = neighbors;
         this.metric = metric;
-        Comparator<HeapNode> distComparator = (arg0, arg1) -> Double.compare(arg0.dist, arg1.dist);
-        this.points = new MaxHeap<>(distComparator, neighbors);
+        this.points = new MaxHeap<>(neighbors);
         this.search(tree);
     }
 
+    public void add(T data) {
+        double dist = this.metric.eval(this.center, data);
+        double radius = this.getRadius();
+        if (dist <= radius) {
+            this.points.add(new Ordered<>(dist, data));
+            while (this.points.size() > neighbors) {
+                this.points.extractMax();
+            }
+        }
+    }
+
     public void addAll(Collection<T> data) {
-        data.stream()
-                .map(HeapNode::new)
-                .forEach(b -> this.points.add(b, this.neighbors));
+        data.stream().forEach(this::add);
     }
 
     public double getRadius() {
         if (this.points.size() < this.neighbors) {
             return Float.POSITIVE_INFINITY;
         } else {
-            return this.points.getMax().dist;
+            return this.points.getMax()
+                    .orElseThrow()
+                    .getOrder();
         }
     }
 
     public Set<T> extract() {
         Set<T> collected = new HashSet<>();
         while (!this.points.isEmpty()) {
-            this.points.extractMax().map(b -> b.point).ifPresent(collected::add);
+            this.points.extractMax().map(b -> b.getData()).ifPresent(collected::add);
         }
         return collected;
     }
