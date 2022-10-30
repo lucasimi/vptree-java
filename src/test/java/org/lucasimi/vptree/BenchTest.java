@@ -13,17 +13,24 @@ public class BenchTest {
 
     private static final int BASE = 10;
 
-    private static final int MAX_POWER = 6;
+    private static final int MAX_POWER = 4;
 
     private static final Logger LOGGER = Logger.getLogger(BenchTest.class.getName());
 
     private static final Random rand = new Random();
 
-    private Metric<Integer> metric = new Metric<Integer>() {
+    private Metric<double[]> metric = new Metric<double[]>() {
 
         @Override
-        public double eval(Integer x, Integer y) {
-            return Math.abs(x - y);
+        public double eval(double[] x, double[] y) {
+            double sum = 0.0;
+            double delta = 0.0;
+            int size = Math.min(x.length, y.length);
+            for (int i = 0; i < size; i++) {
+                delta = x[i] - y[i];
+                sum += delta * delta;
+            }
+            return Math.sqrt(sum);
         }
 
     };
@@ -88,10 +95,10 @@ public class BenchTest {
     @Test
     public void benchAll() {
         int size = (int) Math.pow(BASE, MAX_POWER);
-        List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, size);
-        List<Integer> sample = sample(dataset, (int) (0.1 * dataset.size()));
-        benchmarkVPTreeSimple(sample, metric, 2.5, 10);
-        benchmarkVPTreeADT(sample, metric, 2.5, 10);
+        List<double[]> dataset = DatasetGenerator.randomDataset(size, 128, 0, size);
+        List<double[]> sample = sample(dataset, (int) (0.1 * dataset.size()));
+        benchmarkVPTreeSimple(sample, metric, 100.5, 10);
+        benchmarkVPTreeADT(sample, metric, 100.5, 10);
     }
 
 }
