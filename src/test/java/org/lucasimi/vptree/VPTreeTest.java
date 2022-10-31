@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.lucasimi.DatasetGenerator;
 import org.lucasimi.utils.Metric;
 
-public class VPTreeADTTest {
+public class VPTreeTest {
 
     private static final int MAX_POWER = 10;
 
@@ -76,7 +76,7 @@ public class VPTreeADTTest {
     public void testBallSearchSingleton() {
         List<Integer> dataset = new ArrayList<>(1);
         dataset.add(1);
-        VPTree<Integer> vpTree = new VPTreeADT.Builder<Integer>()
+        VPTree<Integer> vpTree = new VPTree.Builder<Integer>()
                 .withMetric(metric)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(1, 10.0);
@@ -87,7 +87,7 @@ public class VPTreeADTTest {
     public void testBallSearchRandom() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, size / 10);
-        VPTree<Integer> vpTree = new VPTreeADT.Builder<Integer>()
+        VPTree<Integer> vpTree = new VPTree.Builder<Integer>()
                 .withMetric(metric)
                 .withLeafCapacity(10)
                 .build(dataset);
@@ -98,7 +98,7 @@ public class VPTreeADTTest {
     public void testBallSearchLine() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.linearDataset(size);
-        VPTree<Integer> vpTree = new VPTreeADT.Builder<Integer>()
+        VPTree<Integer> vpTree = new VPTree.Builder<Integer>()
                 .withMetric(metric)
                 .withLeafCapacity(100)
                 .build(dataset);
@@ -109,7 +109,7 @@ public class VPTreeADTTest {
     public void testBallSearchDuplicates() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, 1);
-        VPTree<Integer> vpTree = new VPTreeADT.Builder<Integer>()
+        VPTree<Integer> vpTree = new VPTree.Builder<Integer>()
                 .withMetric(metric)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(0, 1.5);
@@ -119,7 +119,7 @@ public class VPTreeADTTest {
     @Test
     public void testKNNSearch() {
         List<Integer> dataset = DatasetGenerator.linearDataset(1000);
-        VPTree<Integer> vpTree = new VPTreeADT.Builder<Integer>()
+        VPTree<Integer> vpTree = new VPTree.Builder<Integer>()
                 .withMetric(metric)
                 .withLeafCapacity(10)
                 .build(dataset);
@@ -130,7 +130,7 @@ public class VPTreeADTTest {
     public void testKNNSearchLine() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.linearDataset(size);
-        VPTree<Integer> vpTree = new VPTreeADT.Builder<Integer>()
+        VPTree<Integer> vpTree = new VPTree.Builder<Integer>()
                 .withMetric(metric)
                 .withLeafCapacity(100)
                 .build(dataset);

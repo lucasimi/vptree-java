@@ -64,24 +64,9 @@ public class BenchTest {
         return t1 - t0;
     }
 
-    private <T> void benchmarkVPTreeSimple(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+    private <T> void benchmarkVPTree(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
         long t0 = System.currentTimeMillis();
-        VPTree<T> vpTree = new VPTreeSimple.Builder<T>()
-                .withMetric(metric)
-                .withLeafCapacity(neighbors)
-                .withLeafRadius(eps)
-                .build(dataset);
-        long t1 = System.currentTimeMillis();
-        LOGGER.info(String.format("VPTreeSimple\t [build]:     \t %dms", t1 - t0));
-        long deltaBallSearch = benchmarkBallSearch(dataset, metric, vpTree, eps);
-        LOGGER.info(String.format("VPTreeSimple\t [ballSearch]:\t %dms", deltaBallSearch));
-        long deltaKNNSearch = benchmarkKNNSearch(dataset, metric, vpTree, neighbors);
-        LOGGER.info(String.format("VPTreeSimple\t [knnSearch]: \t %dms", deltaKNNSearch));
-    }
-
-    private <T> void benchmarkVPTreeADT(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
-        long t0 = System.currentTimeMillis();
-        VPTree<T> vpTree = new VPTreeADT.Builder<T>()
+        VPTree<T> vpTree = new VPTree.Builder<T>()
                 .withMetric(metric)
                 .withLeafRadius(eps)
                 .withLeafCapacity(neighbors)
@@ -101,8 +86,7 @@ public class BenchTest {
         List<double[]> sample = sample(dataset, (int) (0.01 * dataset.size()));
         double radius = 10.0 * Math.sqrt(DIMENSIONS);
         int neighbors = size / 100;
-        benchmarkVPTreeSimple(sample, metric, radius, neighbors);
-        benchmarkVPTreeADT(sample, metric, radius, neighbors);
+        benchmarkVPTree(sample, metric, radius, neighbors);
     }
 
 }
