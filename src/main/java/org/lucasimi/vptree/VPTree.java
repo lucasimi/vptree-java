@@ -23,9 +23,9 @@ public class VPTree<T> {
 
     private final double leafRadius;
 
-    private List<Ordered<Double, T>> dataset;
+    private final List<Ordered<Double, T>> dataset;
 
-    private Collection<T> centers;
+    private final Collection<T> centers;
 
     private static final Random rand = new Random();
 
@@ -35,7 +35,7 @@ public class VPTree<T> {
 
         private final double eps;
 
-        private List<T> points;
+        private final List<T> points;
 
         public BallSearch(T target, double eps) {
             this.target = target;
@@ -103,7 +103,7 @@ public class VPTree<T> {
 
         public double getRadius() {
             if (this.points.size() < this.neighbors) {
-                return Float.POSITIVE_INFINITY;
+                return Double.POSITIVE_INFINITY;
             } else {
                 return this.points.getMax()
                         .orElseThrow()

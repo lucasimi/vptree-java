@@ -1,6 +1,8 @@
 package org.lucasimi.vptree;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -47,24 +49,31 @@ public class BenchTest {
     }
 
     private <T> long benchmarkBallSearch(List<T> sample, Metric<T> metric, VPTree<T> vpTree, double eps) {
+        String prefix = "VPTree - ballSearch:\t";
         long t0 = System.currentTimeMillis();
+        Collection<T> results = new LinkedList<>();
         for (T testPoint : sample) {
-            vpTree.ballSearch(testPoint, eps);
+            results = vpTree.ballSearch(testPoint, eps);
         }
         long t1 = System.currentTimeMillis();
+        LOGGER.info(String.format(prefix + "Run in %dms (%d results)", t1 - t0, results.size()));
         return t1 - t0;
     }
 
     private <T> long benchmarkKNNSearch(List<T> sample, Metric<T> metric, VPTree<T> vpTree, int neighbors) {
+        String prefix = "VPTree - knnSearch: \t";
         long t0 = System.currentTimeMillis();
+        Collection<T> results = new LinkedList<>();
         for (T testPoint : sample) {
-            vpTree.knnSearch(testPoint, neighbors);
+            results = vpTree.knnSearch(testPoint, neighbors);
         }
         long t1 = System.currentTimeMillis();
+        LOGGER.info(String.format(prefix + "Run in %dms (%d results)", t1 - t0, results.size()));
         return t1 - t0;
     }
 
-    private <T> void benchmarkVPTree(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+    private <T> VPTree<T> benchmarkBuild(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+        String prefix = "VPTree - build:     \t";
         long t0 = System.currentTimeMillis();
         VPTree<T> vpTree = new VPTree.Builder<T>()
                 .withMetric(metric)
@@ -72,11 +81,14 @@ public class BenchTest {
                 .withLeafCapacity(neighbors)
                 .build(dataset);
         long t1 = System.currentTimeMillis();
-        LOGGER.info(String.format("VPTreeADT\t [build]:     \t %dms", t1 - t0));
-        long deltaBallSearch = benchmarkBallSearch(dataset, metric, vpTree, eps);
-        LOGGER.info(String.format("VPTreeADT\t [ballSearch]:\t %dms", deltaBallSearch));
-        long deltaKNNSearch = benchmarkKNNSearch(dataset, metric, vpTree, neighbors);
-        LOGGER.info(String.format("VPTreeADT\t [knnSearch]: \t %dms", deltaKNNSearch));
+        LOGGER.info(String.format(prefix + "%dms", t1 - t0));
+        return vpTree;
+    }
+
+    private <T> void benchmark(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+        VPTree<T> vpTree = benchmarkBuild(dataset, metric, eps, neighbors);
+        benchmarkBallSearch(dataset, metric, vpTree, eps);
+        benchmarkKNNSearch(dataset, metric, vpTree, neighbors);
     }
 
     @Test
@@ -84,9 +96,9 @@ public class BenchTest {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<double[]> dataset = DatasetGenerator.randomDataset(size, DIMENSIONS, 8.0, 12.0);
         List<double[]> sample = sample(dataset, (int) (0.01 * dataset.size()));
-        double radius = 10.0 * Math.sqrt(DIMENSIONS);
-        int neighbors = size / 100;
-        benchmarkVPTree(sample, metric, radius, neighbors);
+        double radius = 1.5 * Math.sqrt(DIMENSIONS);
+        int neighbors = (int) (0.001 * dataset.size());
+        benchmark(sample, metric, radius, neighbors);
     }
 
 }
