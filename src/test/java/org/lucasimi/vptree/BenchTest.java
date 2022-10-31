@@ -13,7 +13,9 @@ public class BenchTest {
 
     private static final int BASE = 10;
 
-    private static final int MAX_POWER = 4;
+    private static final int MAX_POWER = 5;
+
+    private static final int DIMENSIONS = 32;
 
     private static final Logger LOGGER = Logger.getLogger(BenchTest.class.getName());
 
@@ -95,10 +97,12 @@ public class BenchTest {
     @Test
     public void benchAll() {
         int size = (int) Math.pow(BASE, MAX_POWER);
-        List<double[]> dataset = DatasetGenerator.randomDataset(size, 128, 0, size);
-        List<double[]> sample = sample(dataset, (int) (0.1 * dataset.size()));
-        benchmarkVPTreeSimple(sample, metric, 100.5, 10);
-        benchmarkVPTreeADT(sample, metric, 100.5, 10);
+        List<double[]> dataset = DatasetGenerator.randomDataset(size, DIMENSIONS, 8.0, 12.0);
+        List<double[]> sample = sample(dataset, (int) (0.01 * dataset.size()));
+        double radius = 10.0 * Math.sqrt(DIMENSIONS);
+        int neighbors = size / 100;
+        benchmarkVPTreeSimple(sample, metric, radius, neighbors);
+        benchmarkVPTreeADT(sample, metric, radius, neighbors);
     }
 
 }
