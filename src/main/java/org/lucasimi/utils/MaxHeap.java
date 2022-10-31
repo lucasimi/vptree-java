@@ -1,25 +1,24 @@
 package org.lucasimi.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class MaxHeap<T> {
+public class MaxHeap<T extends Comparable<T>> {
 
     private List<T> array;
 
-    private Comparator<T> comparator;
-
-    public MaxHeap(Comparator<T> comparator, int capacity) {
-        this.comparator = comparator;
-        // this.array = new ArrayList<>(capacity + 1);
-        this.array = new LinkedList<>();
+    public MaxHeap(int capacity) {
+        this.array = new ArrayList<>(capacity + 1);
     }
 
-    public T getMax() {
-        return array.get(0);
+    public Optional<T> getMax() {
+        if (this.array.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(array.get(0));
+        }
     }
 
     public Optional<T> extractMax() {
@@ -30,46 +29,72 @@ public class MaxHeap<T> {
             int lastIndex = this.array.size() - 1;
             this.array.set(0, this.array.get(lastIndex));
             this.array.remove(lastIndex);
-            this.heapify(0);
+            this.siftDown(0);
             return Optional.of(max);
         }
     }
 
-    public boolean add(T value) {
+    public void add(T value) {
         this.array.add(value);
-        int nodeIndex = this.array.size() - 1;
-        int parentIndex = getParent(nodeIndex);
-        T nodeValue = this.array.get(nodeIndex);
-        T parentValue = this.array.get(parentIndex);
-        while (nodeIndex > 0 && this.comparator.compare(nodeValue, parentValue) > 0) {
-            this.array.set(nodeIndex, parentValue);
-            this.array.set(parentIndex, nodeValue);
-            nodeIndex = parentIndex;
-            parentIndex = getParent(nodeIndex);
-            parentValue = this.array.get(parentIndex);
-        }
-        return true;
+        int node = this.array.size() - 1;
+        siftUp(node);
     }
 
-    public void add(T value, int maxSize) {
-        this.add(value);
-        while (this.size() > maxSize) {
-            this.extractMax();
+    private void siftUp(int index) {
+        int node = index;
+        boolean check = false;
+        T nodeVal = this.array.get(node);
+        while (!check) {
+            int par = getParent(node);
+            T parVal = this.array.get(par);
+            if (parVal.compareTo(nodeVal) >= 0) {
+                check = true;
+            } else {
+                this.array.set(par, nodeVal);
+                this.array.set(node, parVal);
+                node = par;
+            }
+        }
+    }
+
+    private void siftDown(int index) {
+        if (index >= this.array.size()) {
+            return;
+        }
+        int node = index;
+        boolean check = false;
+        T nodeVal = this.array.get(node);
+        while (!check) {
+            int max = node;
+            T maxVal = nodeVal;
+            int left = getLeft(node);
+            if (left < this.array.size()) {
+                T leftVal = this.array.get(left);
+                if (maxVal.compareTo(leftVal) < 0) {
+                    max = left;
+                    maxVal = leftVal;
+                }
+            }
+            int right = getRight(node);
+            if (right < this.array.size()) {
+                T rightVal = this.array.get(right);
+                if (maxVal.compareTo(rightVal) < 0) {
+                    max = right;
+                    maxVal = rightVal;
+                }
+            }
+            check = max == node;
+            if (!check) {
+                this.array.set(node, maxVal);
+                this.array.set(max, nodeVal);
+                node = max;
+            }
         }
     }
 
     public void addAll(Collection<T> values) {
         for (T value : values) {
             this.add(value);
-        }
-    }
-
-    public void addAll(Collection<T> values, int maxSize) {
-        for (T value : values) {
-            this.add(value);
-            while (this.size() > maxSize) {
-                this.extractMax();
-            }
         }
     }
 
@@ -83,29 +108,6 @@ public class MaxHeap<T> {
 
     private int getParent(int i) {
         return (i - 1) / 2;
-    }
-
-    private void heapify(int i) {
-        int left = getLeft(i);
-        int right = getRight(i);
-        if (left >= this.array.size()) {
-            return;
-        }
-        int maxChild = left;
-        if (right < this.array.size()) {
-            T leftValue = this.array.get(left);
-            T rightValue = this.array.get(right);
-            if (this.comparator.compare(leftValue, rightValue) < 0) {
-                maxChild = right;
-            }
-        }
-        T value = this.array.get(i);
-        T minValue = this.array.get(maxChild);
-        if (this.comparator.compare(value, minValue) < 0) {
-            this.array.set(i, minValue);
-            this.array.set(maxChild, value);
-            this.heapify(maxChild);
-        }
     }
 
     public int size() {

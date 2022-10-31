@@ -27,4 +27,16 @@ public class DatasetGenerator {
         return array;
     }
 
+    public static List<double[]> randomDataset(int size, int dim, double min, double bound) {
+        List<double[]> array = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            double[] point = new double[dim];
+            for (int j = 0; j < dim; j++) {
+                point[j] = min + (bound - min) * (rand.nextDouble());
+            }
+            array.add(point);
+        }
+        return array;
+    }
+
 }
