@@ -1,13 +1,13 @@
-name: deploy
+name: test
 
-on:
+on: 
   push:
     branches:
+      - develop
       - main
 
 jobs:
-  deploy-job:
-    needs: test
+  test-job:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,6 +17,4 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Run Maven
-        run: mvn --batch-mode --update-snapshots clean deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn --batch-mode --update-snapshots clean verify
