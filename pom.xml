@@ -15,7 +15,7 @@
   </properties>
   <distributionManagement> 
     <repository>
-        <id>github</id>
+        <id>vptree-java</id>
         <name>GitHub Apache Maven Packages</name>
         <url>https://maven.pkg.github.com/lucasimi/vptree-java</url>
     </repository>
