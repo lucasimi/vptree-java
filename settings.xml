@@ -3,7 +3,7 @@
     <server>
       <id>vptree-java</id>
       <username>lucasimi</username>
-      <password>${env.PACKAGES_PAT}</password>
+      <password>${env.PACKAGES_WRITE_PAT}</password>
     </server>
   </servers>
 </settings>
