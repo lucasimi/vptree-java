@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>org.lucasimi</groupId>
   <artifactId>vptree</artifactId>
   <version>1.0-SNAPSHOT</version>
-
   <name>vptree</name>
   <url>https://github.com/lucasimi/vptree-java</url>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <junit.version>4.13.1</junit.version>
   </properties>
-
   <distributionManagement> 
     <repository>
         <id>github</id>
@@ -25,7 +20,6 @@
         <url>https://maven.pkg.github.com/lucasimi/vptree-java</url>
     </repository>
   </distributionManagement> 
-
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -34,7 +28,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <pluginManagement>
       <plugins>
