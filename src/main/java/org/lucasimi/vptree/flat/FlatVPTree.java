@@ -88,8 +88,8 @@ public class FlatVPTree<T> implements VPTree<T> {
         this.vpArr.get(start).setOrder(radius);
         if (radius >= this.leafRadius) {
             buildNoRandRec(start + 1, mid);
-            buildRandRec(mid, bound);
         }
+        buildNoRandRec(mid, bound);
     }
 
     private void buildRandRec(int start, int bound) {
@@ -97,7 +97,7 @@ public class FlatVPTree<T> implements VPTree<T> {
             return;
         }
         int mid = (start + 1 + bound) / 2;
-        int pivot = RAND.nextInt(start, bound);
+        int pivot = start + RAND.nextInt(bound);
         swap(start, pivot);
         Ordered<Double, T> center = this.vpArr.get(start);
         for (int i = start; i < bound; i++) {
@@ -109,8 +109,8 @@ public class FlatVPTree<T> implements VPTree<T> {
         this.vpArr.get(start).setOrder(radius);
         if (radius >= this.leafRadius) {
             buildRandRec(start + 1, mid);
-            buildRandRec(mid, bound);
         }
+        buildRandRec(mid, bound);
     }
 
     private void ballSearchRec(T target, double eps, Collection<T> results, int start, int bound) {

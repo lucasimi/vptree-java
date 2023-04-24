@@ -65,7 +65,8 @@ public class BenchTest {
         return sample;
     }
 
-    private <T> long benchmarkBallSearch(List<T> sample, Metric<T> metric, VPTree<T> vpTree, double eps) {
+    private <T> void benchmarkBallSearch(List<T> dataset, VPTree<T> vpTree, double eps) {
+        List<T> sample = sample(dataset, (int) (0.1 * dataset.size()));
         long t0 = System.currentTimeMillis();
         for (T testPoint : sample) {
             vpTree.ballSearch(testPoint, eps);
@@ -73,10 +74,10 @@ public class BenchTest {
         long t1 = System.currentTimeMillis();
         String name = vpTree.getClass().getSimpleName();
         report.get(name).put(BALL_SEARCH, t1 - t0);
-        return t1 - t0;
     }
 
-    private <T> long benchmarkKNNSearch(List<T> sample, Metric<T> metric, VPTree<T> vpTree, int neighbors) {
+    private <T> void benchmarkKNNSearch(List<T> dataset, VPTree<T> vpTree, int neighbors) {
+        List<T> sample = sample(dataset, (int) (0.1 * dataset.size()));
         long t0 = System.currentTimeMillis();
         for (T testPoint : sample) {
             vpTree.knnSearch(testPoint, neighbors);
@@ -84,41 +85,68 @@ public class BenchTest {
         long t1 = System.currentTimeMillis();
         String name = vpTree.getClass().getSimpleName();
         report.get(name).put(KNN_SEARCH, t1 - t0);
-        return t1 - t0;
     }
 
-    private <T> SplitVPTree<T> benchmarkBuildSplit(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+    private <T> void benchmarkBallSearch(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+        SplitVPTree<T> splitVPTree = SplitVPTree.<T>newBuilder()
+            .withMetric(metric)
+            .withLeafRadius(eps)
+            .withLeafCapacity(neighbors)
+            .build(dataset);
+        benchmarkBallSearch(dataset, splitVPTree, eps);
+        FlatVPTree<T> flatVPTree = FlatVPTree.<T>newBuilder()
+            .withMetric(metric)
+            .withLeafRadius(eps)
+            .withLeafCapacity(neighbors)
+            .build(dataset);
+        benchmarkBallSearch(dataset, flatVPTree, eps);
+    }
+
+    private <T> void benchmarkKNNSearch(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+        SplitVPTree<T> splitVPTree = SplitVPTree.<T>newBuilder()
+            .withMetric(metric)
+            .withLeafRadius(eps)
+            .withLeafCapacity(neighbors)
+            .build(dataset);
+        benchmarkKNNSearch(dataset, splitVPTree, neighbors);
+        FlatVPTree<T> flatVPTree = FlatVPTree.<T>newBuilder()
+            .withMetric(metric)
+            .withLeafRadius(eps)
+            .withLeafCapacity(neighbors)
+            .build(dataset);
+        benchmarkKNNSearch(dataset, flatVPTree, neighbors);
+    }
+
+    private <T> void benchmarkBuild(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
+        int sampleSize = (int) (0.1 * dataset.size());
         long t0 = System.currentTimeMillis();
-        SplitVPTree<T> vpTree = SplitVPTree.<T>newBuilder()
+        for (int i = 0; i < sampleSize; i++) {
+            SplitVPTree.<T>newBuilder()
                 .withMetric(metric)
                 .withLeafRadius(eps)
                 .withLeafCapacity(neighbors)
                 .build(dataset);
+        }
         long t1 = System.currentTimeMillis();
-        String name = vpTree.getClass().getSimpleName();
-        report.get(name).put(BUILD, t1 - t0);
-        return vpTree;
-    }
-
-    private <T> FlatVPTree<T> benchmarkBuildFlat(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
-        long t0 = System.currentTimeMillis();
-        FlatVPTree<T> vpTree = FlatVPTree.<T>newBuilder()
+        String splitName = SplitVPTree.class.getSimpleName();
+        report.get(splitName).put(BUILD, t1 - t0);
+        long t2 = System.currentTimeMillis();
+        for (int i = 0; i < sampleSize; i++) {
+            FlatVPTree.<T>newBuilder()
                 .withLeafCapacity(neighbors)
                 .withLeafRadius(eps)
                 .withMetric(metric)
                 .build(dataset);
-        long t1 = System.currentTimeMillis();
-        String name = vpTree.getClass().getSimpleName();
-        report.get(name).put(BUILD, t1 - t0);
-        return vpTree;
+        }
+        long t3 = System.currentTimeMillis();
+        String flatName = FlatVPTree.class.getSimpleName();
+        report.get(flatName).put(BUILD, t3 - t2);
     }
 
     private <T> void benchmark(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
-        SplitVPTree<T> splitVpTree = benchmarkBuildSplit(dataset, metric, eps, neighbors);
-        benchmarkBallSearch(dataset, metric, splitVpTree, eps);
-        benchmarkKNNSearch(dataset, metric, splitVpTree, neighbors);
-        FlatVPTree<T> flatVpTree = benchmarkBuildFlat(dataset, metric, eps, neighbors);
-        benchmarkBallSearch(dataset, metric, flatVpTree, eps);
+        benchmarkBuild(dataset, metric, eps, neighbors);
+        benchmarkBallSearch(dataset, metric, eps, neighbors);
+        benchmarkKNNSearch(dataset, metric, eps, neighbors);
     }
 
     private void printReport() {
