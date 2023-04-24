@@ -59,6 +59,8 @@ public class FlatVPTreeTest {
         dataset.add(1);
         FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withLeafRadius(5)
+                .withLeafCapacity(10)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(1, 10.0);
         assertTrue(res.contains(1));
@@ -70,6 +72,8 @@ public class FlatVPTreeTest {
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, size / 10);
         FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withLeafRadius(5)
+                .withLeafCapacity(10)
                 .build(dataset);
         testBallSearch(dataset, metric, vpTree, 2.5);
     }
@@ -80,6 +84,8 @@ public class FlatVPTreeTest {
         List<Integer> dataset = DatasetGenerator.linearDataset(size);
         FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withLeafRadius(5)
+                .withLeafCapacity(10)
                 .build(dataset);
         testBallSearch(dataset, metric, vpTree, 2.5);
     }
@@ -90,6 +96,8 @@ public class FlatVPTreeTest {
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, 1);
         FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withLeafRadius(5)
+                .withLeafCapacity(10)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(0, 1.5);
         assertEquals(size, res.size());

@@ -15,6 +15,10 @@ public class FlatVPTree<T> implements VPTree<T> {
 
     private static final Random RAND = new Random();
 
+    private final int leafCapacity;
+
+    private final double leafRadius;
+
     private final Metric<T> metric;
 
     private final ArrayList<Ordered<Double, T>> vpArr;
@@ -26,6 +30,8 @@ public class FlatVPTree<T> implements VPTree<T> {
     private FlatVPTree(Builder<T> builder, Collection<T> data) {
         this.metric = builder.metric;
         this.vpArr = new ArrayList<>(data.size());
+        this.leafCapacity = builder.leafCapacity;
+        this.leafRadius = builder.leafRadius;
         for (T x : data) {
             this.vpArr.add(new Ordered<>(0.0, x));
         }
@@ -68,7 +74,7 @@ public class FlatVPTree<T> implements VPTree<T> {
     }
 
     private void buildNoRandRec(int start, int bound) {
-        if (bound <= start + 1) {
+        if (bound <= start + this.leafCapacity) {
             return;
         }
         int mid = (start + 1 + bound) / 2;
@@ -80,12 +86,14 @@ public class FlatVPTree<T> implements VPTree<T> {
         Pivoter.quickSelect(this.vpArr, start + 1, bound, mid);
         double radius = this.vpArr.get(mid).getOrder();
         this.vpArr.get(start).setOrder(radius);
-        buildNoRandRec(start + 1, mid);
-        buildRandRec(mid, bound);
+        if (radius >= this.leafRadius) {
+            buildNoRandRec(start + 1, mid);
+            buildRandRec(mid, bound);
+        }
     }
 
     private void buildRandRec(int start, int bound) {
-        if (bound <= start + 1) {
+        if (bound <= start + this.leafCapacity) {
             return;
         }
         int mid = (start + 1 + bound) / 2;
@@ -99,32 +107,46 @@ public class FlatVPTree<T> implements VPTree<T> {
         Pivoter.quickSelect(this.vpArr, start + 1, bound, mid);
         double radius = this.vpArr.get(mid).getOrder();
         this.vpArr.get(start).setOrder(radius);
-        buildRandRec(start + 1, mid);
-        buildRandRec(mid, bound);
+        if (radius >= this.leafRadius) {
+            buildRandRec(start + 1, mid);
+            buildRandRec(mid, bound);
+        }
     }
 
     private void ballSearchRec(T target, double eps, Collection<T> results, int start, int bound) {
-        if (bound == start + 1) {
-            Ordered<Double, T> ord = this.vpArr.get(start);
-            T center = ord.getData();
-            double dist = this.metric.eval(center, target);
-            if (dist <= eps) {
-                results.add(center);
+        if (bound <= start + this.leafCapacity) {
+            for (int i = start; i < bound; i++) {
+                Ordered<Double, T> ord = this.vpArr.get(i);
+                T center = ord.getData();
+                double dist = this.metric.eval(center, target);
+                if (dist <= eps) {
+                    results.add(center);
+                }
             }
-        } else if (bound > start + 1) {
+        } else {
             int mid = (start + 1 + bound) / 2;
             Ordered<Double, T> ord = this.vpArr.get(start);
             T center = ord.getData();
             double radius = ord.getOrder();
-            double dist = this.metric.eval(center, target);
-            if (dist <= eps) {
-                results.add(center);
-            }
-            if (dist < radius + eps) {
-                ballSearchRec(target, eps, results, start + 1, mid);
-            }
-            if (dist >= radius - eps) {
-                ballSearchRec(target, eps, results, mid, bound);
+            if (radius < this.leafRadius) {
+                for (int i = start; i < bound; i++) {
+                    T point = this.vpArr.get(i).getData();
+                    double dist = this.metric.eval(target, point);
+                    if (dist <= eps) {
+                        results.add(point);
+                    }
+                }
+            } else {
+                double dist = this.metric.eval(center, target);
+                if (dist <= eps) {
+                    results.add(center);
+                }
+                if (dist < radius + eps) {
+                    ballSearchRec(target, eps, results, start + 1, mid);
+                }
+                if (dist >= radius - eps) {
+                    ballSearchRec(target, eps, results, mid, bound);
+                }
             }
         }
     }
@@ -133,12 +155,26 @@ public class FlatVPTree<T> implements VPTree<T> {
 
         private Metric<T> metric;
 
-		private boolean randomPivoting;
+        private int leafCapacity = 1;
+
+        private double leafRadius = 0.0;
+
+        private boolean randomPivoting = true;
 
         private Builder() {}
 
         public Builder<T> withMetric(Metric<T> metric) {
             this.metric = metric;
+            return this;
+        }
+
+        public Builder<T> withLeafCapacity(int leafCapacity) {
+            this.leafCapacity = leafCapacity;
+            return this;
+        }
+
+        public Builder<T> withLeafRadius(double leafRadius) {
+            this.leafRadius = leafRadius;
             return this;
         }
 

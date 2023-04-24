@@ -103,6 +103,8 @@ public class BenchTest {
     private <T> FlatVPTree<T> benchmarkBuildFlat(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
         long t0 = System.currentTimeMillis();
         FlatVPTree<T> vpTree = FlatVPTree.<T>newBuilder()
+                .withLeafCapacity(neighbors)
+                .withLeafRadius(eps)
                 .withMetric(metric)
                 .build(dataset);
         long t1 = System.currentTimeMillis();
@@ -139,7 +141,7 @@ public class BenchTest {
         List<double[]> sample = sample(dataset, (int) (0.01 * dataset.size()));
         double radius = 1.5 * Math.sqrt(DIMENSIONS);
         int neighbors = (int) (0.001 * dataset.size());
-        benchmark(sample, metric, 1, 1);
+        benchmark(sample, metric, radius, neighbors);
         printReport();
     }
 
