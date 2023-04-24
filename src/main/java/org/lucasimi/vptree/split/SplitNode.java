@@ -1,4 +1,6 @@
-package org.lucasimi.vptree;
+package org.lucasimi.vptree.split;
+
+import org.lucasimi.vptree.search.SearchAlgorithm;
 
 public class SplitNode<T> implements SplitTree<T> {
 

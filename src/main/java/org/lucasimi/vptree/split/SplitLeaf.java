@@ -1,6 +1,8 @@
-package org.lucasimi.vptree;
+package org.lucasimi.vptree.split;
 
 import java.util.Collection;
+
+import org.lucasimi.vptree.search.SearchAlgorithm;
 
 public class SplitLeaf<T> implements SplitTree<T> {
 

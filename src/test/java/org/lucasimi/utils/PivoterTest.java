@@ -13,8 +13,11 @@ import org.lucasimi.DatasetGenerator;
 
 public class PivoterTest {
 
-    // private static final Logger LOGGER =
-    // LoggerFactory.getLogger(PivoterTest.class);
+    private static final Random RAND = new Random();
+
+    private static final int TIMES = 1000;
+
+    private static final int SIZE = 1000;
 
     public void testPivotLinearity() {
         Random rand = new Random();
@@ -44,12 +47,44 @@ public class PivoterTest {
 
     @Test
     public void testMinRandom() {
-        int times = 1000;
-        for (int i = 0; i < times; i++) {
-            List<Integer> array = DatasetGenerator.randomDataset(1000, 1, 500);
+        for (int i = 0; i < TIMES; i++) {
+            List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
             Pivoter.quickSelect(array, 0, array.size(), 0);
             Integer foundMin = array.get(0);
             assertEquals(findMin(array), foundMin);
+        }
+    }
+
+    @Test
+    public void testPartitionRandom() {
+        for (int i = 0; i < TIMES; i++) {
+            List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
+            int k = RAND.nextInt(0, array.size());
+            Integer pivot = array.get(k);
+            int h = Pivoter.partition(array, 0, array.size(), k);
+            for (int j = 0; j < h - 1; j++) {
+                assertTrue(array.get(j) <= pivot);
+            }
+            assertEquals(pivot, array.get(h - 1));
+            for (int j = h; j < array.size(); j++) {
+                assertTrue(array.get(j) > pivot);
+            }
+        }
+    }
+
+    @Test
+    public void testQuickSelectRandom() {
+        for (int i = 0; i < TIMES; i++) {
+            List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
+            int k = RAND.nextInt(0, array.size());
+            Pivoter.quickSelect(array, 0, array.size(), k);
+            Integer pivot = array.get(k);
+            for (int j = 0; j < k; j++) {
+                assertTrue(array.get(j) <= pivot);
+            }
+            for (int j = k; j < array.size(); j++) {
+                assertTrue(array.get(j) >= pivot);
+            }
         }
     }
 

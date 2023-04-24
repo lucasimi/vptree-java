@@ -1,6 +1,9 @@
-package org.lucasimi.vptree;
+package org.lucasimi.vptree.search;
 
 import java.util.Collection;
+
+import org.lucasimi.vptree.split.SplitNode;
+import org.lucasimi.vptree.split.SplitLeaf;
 
 public interface SearchAlgorithm<T> {
 

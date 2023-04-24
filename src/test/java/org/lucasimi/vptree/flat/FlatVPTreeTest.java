@@ -1,7 +1,6 @@
-package org.lucasimi.vptree;
+package org.lucasimi.vptree.flat;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class FlatVPTreeTest {
     @Test
     public void testCreateEmpty() {
         List<Integer> dataset = new LinkedList<>();
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
     }
@@ -40,7 +39,7 @@ public class FlatVPTreeTest {
     public void testCreateSingleton() {
         List<Integer> dataset = new LinkedList<>();
         dataset.add(1);
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
     }
@@ -49,7 +48,7 @@ public class FlatVPTreeTest {
     public void testCreate() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, 10);
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
     }
@@ -58,7 +57,7 @@ public class FlatVPTreeTest {
     public void testBallSearchSingleton() {
         List<Integer> dataset = new ArrayList<>(1);
         dataset.add(1);
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(1, 10.0);
@@ -69,7 +68,7 @@ public class FlatVPTreeTest {
     public void testBallSearchRandom() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, size / 10);
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
         testBallSearch(dataset, metric, vpTree, 2.5);
@@ -79,7 +78,7 @@ public class FlatVPTreeTest {
     public void testBallSearchLine() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.linearDataset(size);
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
         testBallSearch(dataset, metric, vpTree, 2.5);
@@ -89,7 +88,7 @@ public class FlatVPTreeTest {
     public void testBallSearchDuplicates() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, 1);
-        FlatVPTree<Integer> vpTree = new FlatVPTree.Builder<Integer>()
+        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(0, 1.5);
