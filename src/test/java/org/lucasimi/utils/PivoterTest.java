@@ -59,7 +59,7 @@ public class PivoterTest {
     public void testPartitionRandom() {
         for (int i = 0; i < TIMES; i++) {
             List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
-            int k = RAND.nextInt(0, array.size());
+            int k = RAND.nextInt(array.size());
             Integer pivot = array.get(k);
             int h = Pivoter.partition(array, 0, array.size(), k);
             for (int j = 0; j < h - 1; j++) {
@@ -76,7 +76,7 @@ public class PivoterTest {
     public void testQuickSelectRandom() {
         for (int i = 0; i < TIMES; i++) {
             List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
-            int k = RAND.nextInt(0, array.size());
+            int k = RAND.nextInt(array.size());
             Pivoter.quickSelect(array, 0, array.size(), k);
             Integer pivot = array.get(k);
             for (int j = 0; j < k; j++) {

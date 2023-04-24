@@ -89,7 +89,7 @@ public class SplitVPTree<T> implements VPTree<T> {
             return buildLeaf(start, bound);
         } else {
             int mid = (start + bound) / 2;
-            int pivot = start + RAND.nextInt(bound);
+            int pivot = start + RAND.nextInt(bound - start);
             swap(pivot, start);
             Ordered<Double, T> pivotPoint = this.dataset.get(start);
             T vantagePoint = pivotPoint.getData();

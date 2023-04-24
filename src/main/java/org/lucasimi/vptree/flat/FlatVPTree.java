@@ -97,7 +97,7 @@ public class FlatVPTree<T> implements VPTree<T> {
             return;
         }
         int mid = (start + 1 + bound) / 2;
-        int pivot = start + RAND.nextInt(bound);
+        int pivot = start + RAND.nextInt(bound - start);
         swap(start, pivot);
         Ordered<Double, T> center = this.vpArr.get(start);
         for (int i = start; i < bound; i++) {
