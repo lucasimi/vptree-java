@@ -168,6 +168,15 @@ public class SplitVPTree<T> implements VPTree<T> {
         }
     }
 
+    private double process(int start, int bound, int mid) {
+        Ordered<Double, T> center = this.dataset.get(start);
+        updateDist(center.getData(), start, bound);
+        Pivoter.quickSelect(this.dataset, start + 1, bound, mid);
+        double radius = this.dataset.get(mid).getOrder();
+        this.dataset.get(start).setOrder(radius);
+        return radius;
+    }
+
     public Collection<T> getCenters() {
         return centers;
     }

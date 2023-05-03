@@ -19,9 +19,11 @@ public class BenchTest {
 
     private static final int BASE = 10;
 
-    private static final int MAX_POWER = 6;
+    private static final int MAX_POWER = 5;
 
-    private static final int DIMENSIONS = 100;
+    private static final int DIMENSIONS = 32;
+
+    private static final double SAMPLE_SIZE = 100.0;
 
     private static final Logger LOGGER = Logger.getLogger(BenchTest.class.getName());
 
@@ -66,7 +68,8 @@ public class BenchTest {
     }
 
     private <T> void benchmarkBallSearch(List<T> dataset, VPTree<T> vpTree, double eps) {
-        List<T> sample = sample(dataset, (int) (0.1 * dataset.size()));
+        LOGGER.info("Benchmarking BallSearch");
+        List<T> sample = sample(dataset, (int) SAMPLE_SIZE);
         long t0 = System.currentTimeMillis();
         for (T testPoint : sample) {
             vpTree.ballSearch(testPoint, eps);
@@ -77,7 +80,8 @@ public class BenchTest {
     }
 
     private <T> void benchmarkKNNSearch(List<T> dataset, VPTree<T> vpTree, int neighbors) {
-        List<T> sample = sample(dataset, (int) (0.1 * dataset.size()));
+        LOGGER.info("Benchmarking KNNSearch");
+        List<T> sample = sample(dataset, (int) SAMPLE_SIZE);
         long t0 = System.currentTimeMillis();
         for (T testPoint : sample) {
             vpTree.knnSearch(testPoint, neighbors);
@@ -118,7 +122,8 @@ public class BenchTest {
     }
 
     private <T> void benchmarkBuild(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
-        int sampleSize = (int) (0.1 * dataset.size());
+        LOGGER.info("Benchmarking Build");
+        int sampleSize = (int) (SAMPLE_SIZE);
         long t0 = System.currentTimeMillis();
         for (int i = 0; i < sampleSize; i++) {
             SplitVPTree.<T>newBuilder()
@@ -130,6 +135,7 @@ public class BenchTest {
         long t1 = System.currentTimeMillis();
         String splitName = SplitVPTree.class.getSimpleName();
         report.get(splitName).put(BUILD, t1 - t0);
+        LOGGER.info("Benchmarking Build");
         long t2 = System.currentTimeMillis();
         for (int i = 0; i < sampleSize; i++) {
             FlatVPTree.<T>newBuilder()
@@ -166,10 +172,9 @@ public class BenchTest {
     public void benchAll() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<double[]> dataset = DatasetGenerator.randomDataset(size, DIMENSIONS, 8.0, 12.0);
-        List<double[]> sample = sample(dataset, (int) (0.01 * dataset.size()));
         double radius = 1.5 * Math.sqrt(DIMENSIONS);
         int neighbors = (int) (0.001 * dataset.size());
-        benchmark(sample, metric, radius, neighbors);
+        benchmark(dataset, metric, 0.0, 1);
         printReport();
     }
 

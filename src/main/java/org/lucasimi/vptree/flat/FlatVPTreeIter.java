@@ -11,7 +11,7 @@ import org.lucasimi.utils.Ordered;
 import org.lucasimi.utils.Pivoter;
 import org.lucasimi.vptree.VPTree;
 
-public class FlatVPTree<T> implements VPTree<T> {
+public class FlatVPTreeIter<T> implements VPTree<T> {
 
     private static final Random RAND = new Random();
 
@@ -27,7 +27,7 @@ public class FlatVPTree<T> implements VPTree<T> {
         return new Builder<>();
     }
 
-    private FlatVPTree(Builder<T> builder, Collection<T> data) {
+    private FlatVPTreeIter(Builder<T> builder, Collection<T> data) {
         this.metric = builder.metric;
         this.vpArr = new ArrayList<>(data.size());
         this.leafCapacity = builder.leafCapacity;
@@ -73,46 +73,40 @@ public class FlatVPTree<T> implements VPTree<T> {
         buildNoRandRec(0, this.vpArr.size());
     }
 
-    private void updateDist(T center, int start, int bound) {
-        for (int i = start; i < bound; i++) {
-            Ordered<Double, T> point = this.vpArr.get(i);
-            point.setOrder(this.metric.eval(center, point.getData()));
-        }
-    }
-
     private void buildNoRandRec(int start, int bound) {
         if (bound <= start + this.leafCapacity) {
             return;
         }
-        int mid = getMid(start, bound);
-        double radius = processVpArr(start, bound, mid);
+        int mid = (start + 1 + bound) / 2;
+        Ordered<Double, T> center = this.vpArr.get(start);
+        for (int i = start; i < bound; i++) {
+            Ordered<Double, T> point = this.vpArr.get(i);
+            point.setOrder(this.metric.eval(center.getData(), point.getData()));
+        }
+        Pivoter.quickSelect(this.vpArr, start + 1, bound, mid);
+        double radius = this.vpArr.get(mid).getOrder();
+        this.vpArr.get(start).setOrder(radius);
         if (radius >= this.leafRadius) {
             buildNoRandRec(start + 1, mid);
         }
         buildNoRandRec(mid, bound);
     }
 
-    private static int getMid(int start, int bound) {
-        return (start + 1 + bound) / 2;
-    }
-
-    private double processVpArr(int start, int bound, int mid) {
-        Ordered<Double, T> center = this.vpArr.get(start);
-        updateDist(center.getData(), start, bound);
-        Pivoter.quickSelect(this.vpArr, start + 1, bound, mid);
-        double radius = this.vpArr.get(mid).getOrder();
-        this.vpArr.get(start).setOrder(radius);
-        return radius;
-    }
-
     private void buildRandRec(int start, int bound) {
         if (bound <= start + this.leafCapacity) {
             return;
         }
+        int mid = (start + 1 + bound) / 2;
         int pivot = start + RAND.nextInt(bound - start);
         swap(start, pivot);
-        int mid = getMid(start, bound);
-        double radius = processVpArr(start, bound, mid);
+        Ordered<Double, T> center = this.vpArr.get(start);
+        for (int i = start; i < bound; i++) {
+            Ordered<Double, T> point = this.vpArr.get(i);
+            point.setOrder(this.metric.eval(center.getData(), point.getData()));
+        }
+        Pivoter.quickSelect(this.vpArr, start + 1, bound, mid);
+        double radius = this.vpArr.get(mid).getOrder();
+        this.vpArr.get(start).setOrder(radius);
         if (radius >= this.leafRadius) {
             buildRandRec(start + 1, mid);
         }
@@ -130,7 +124,7 @@ public class FlatVPTree<T> implements VPTree<T> {
                 }
             }
         } else {
-            int mid = getMid(start, bound);
+            int mid = (start + 1 + bound) / 2;
             Ordered<Double, T> ord = this.vpArr.get(start);
             T center = ord.getData();
             double radius = ord.getOrder();
@@ -189,11 +183,11 @@ public class FlatVPTree<T> implements VPTree<T> {
             return this;
         }
 
-        public FlatVPTree<T> build(Collection<T> data) {
+        public FlatVPTreeIter<T> build(Collection<T> data) {
             if (this.metric == null) {
                 throw new IllegalArgumentException("A metric must be specified");
             }
-            return new FlatVPTree<>(this, data);
+            return new FlatVPTreeIter<>(this, data);
         }
 
     }
