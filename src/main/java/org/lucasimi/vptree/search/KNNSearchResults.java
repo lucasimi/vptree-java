@@ -7,28 +7,26 @@ import java.util.Set;
 import org.lucasimi.utils.MaxHeap;
 import org.lucasimi.utils.Metric;
 import org.lucasimi.utils.Ordered;
-import org.lucasimi.vptree.split.SplitLeaf;
-import org.lucasimi.vptree.split.SplitNode;
 
-public class KNNSearch<T> implements SearchAlgorithm<T> {
+public class KNNSearchResults<T> implements SearchResults<T> {
 
     private final Metric<T> metric;
 
-    private final T center;
+    private final T target;
 
     private final int neighbors;
 
     private final MaxHeap<Ordered<Double, T>> points;
 
-    public KNNSearch(Metric<T> metric, T center, int neighbors) {
+    public KNNSearchResults(Metric<T> metric, T target, int neighbors) {
         this.metric = metric;
-        this.center = center;
+        this.target = target;
         this.neighbors = neighbors;
         this.points = new MaxHeap<>(neighbors);
     }
 
     public void add(T data) {
-        double dist = this.metric.eval(this.center, data);
+        double dist = this.metric.eval(this.target, data);
         double radius = this.getRadius();
         if (dist <= radius) {
             this.points.add(new Ordered<>(dist, data));
@@ -63,24 +61,17 @@ public class KNNSearch<T> implements SearchAlgorithm<T> {
         return collected;
     }
 
-    @Override
-    public void search(SplitLeaf<T> leaf) {
-        this.addAll(leaf.getData());
-    }
+	public Metric<T> getMetric() {
+		return metric;
+	}
 
-    @Override
-    public void search(SplitNode<T> node) {
-        double radius = node.getRadius();
-        double dist = this.metric.eval(this.center, node.getCenter());
-        double eps = this.getRadius();
-        if (dist < radius + eps) {
-            node.getLeft().search(this);
-            eps = this.getRadius();
-        }
-        if (dist >= radius - eps) {
-            node.getRight().search(this);
-        }
-    }
+	public T getTarget() {
+		return target;
+	}
+
+	public int getNeighbors() {
+		return neighbors;
+	}
 
 }
 

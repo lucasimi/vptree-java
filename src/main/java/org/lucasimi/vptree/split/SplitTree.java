@@ -1,9 +1,12 @@
 package org.lucasimi.vptree.split;
 
-import org.lucasimi.vptree.search.SearchAlgorithm;
+import org.lucasimi.vptree.search.BallSearchResults;
+import org.lucasimi.vptree.search.KNNSearchResults;
 
 public interface SplitTree<S> {
 
-    public void search(SearchAlgorithm<S> searchAlgorithm);
+    public void ballSearch(BallSearchResults<S> results);
+
+    public void knnSearch(KNNSearchResults<S> results);
 
 }

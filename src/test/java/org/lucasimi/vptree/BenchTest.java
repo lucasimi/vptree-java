@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.junit.Test;
 import org.lucasimi.DatasetGenerator;
 import org.lucasimi.utils.Metric;
+import org.lucasimi.vptree.VPTree.TreeType;
 import org.lucasimi.vptree.flat.FlatVPTree;
 import org.lucasimi.vptree.split.SplitVPTree;
 
@@ -92,31 +93,35 @@ public class BenchTest {
     }
 
     private <T> void benchmarkBallSearch(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
-        SplitVPTree<T> splitVPTree = SplitVPTree.<T>newBuilder()
+        VPTree<T> splitVPTree = VPTree.<T>newBuilder()
             .withMetric(metric)
             .withLeafRadius(eps)
             .withLeafCapacity(neighbors)
+            .withTreeType(TreeType.SPLIT)
             .build(dataset);
         benchmarkBallSearch(dataset, splitVPTree, eps);
-        FlatVPTree<T> flatVPTree = FlatVPTree.<T>newBuilder()
+        VPTree<T> flatVPTree = VPTree.<T>newBuilder()
             .withMetric(metric)
             .withLeafRadius(eps)
             .withLeafCapacity(neighbors)
+            .withTreeType(TreeType.FLAT)
             .build(dataset);
         benchmarkBallSearch(dataset, flatVPTree, eps);
     }
 
     private <T> void benchmarkKNNSearch(List<T> dataset, Metric<T> metric, double eps, int neighbors) {
-        SplitVPTree<T> splitVPTree = SplitVPTree.<T>newBuilder()
+        VPTree<T> splitVPTree = VPTree.<T>newBuilder()
             .withMetric(metric)
             .withLeafRadius(eps)
             .withLeafCapacity(neighbors)
+            .withTreeType(TreeType.SPLIT)
             .build(dataset);
         benchmarkKNNSearch(dataset, splitVPTree, neighbors);
-        FlatVPTree<T> flatVPTree = FlatVPTree.<T>newBuilder()
+        VPTree<T> flatVPTree = VPTree.<T>newBuilder()
             .withMetric(metric)
             .withLeafRadius(eps)
             .withLeafCapacity(neighbors)
+            .withTreeType(TreeType.FLAT)
             .build(dataset);
         benchmarkKNNSearch(dataset, flatVPTree, neighbors);
     }
@@ -126,10 +131,11 @@ public class BenchTest {
         int sampleSize = (int) (SAMPLE_SIZE);
         long t0 = System.currentTimeMillis();
         for (int i = 0; i < sampleSize; i++) {
-            SplitVPTree.<T>newBuilder()
+            VPTree.<T>newBuilder()
                 .withMetric(metric)
                 .withLeafRadius(eps)
                 .withLeafCapacity(neighbors)
+                .withTreeType(TreeType.SPLIT)
                 .build(dataset);
         }
         long t1 = System.currentTimeMillis();
@@ -138,10 +144,11 @@ public class BenchTest {
         LOGGER.info("Benchmarking Build");
         long t2 = System.currentTimeMillis();
         for (int i = 0; i < sampleSize; i++) {
-            FlatVPTree.<T>newBuilder()
+            VPTree.<T>newBuilder()
                 .withLeafCapacity(neighbors)
                 .withLeafRadius(eps)
                 .withMetric(metric)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
         }
         long t3 = System.currentTimeMillis();

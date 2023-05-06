@@ -1,6 +1,8 @@
 package org.lucasimi.vptree.split;
 
-import org.lucasimi.vptree.search.SearchAlgorithm;
+import org.lucasimi.utils.Metric;
+import org.lucasimi.vptree.search.BallSearchResults;
+import org.lucasimi.vptree.search.KNNSearchResults;
 
 public class SplitNode<T> implements SplitTree<T> {
 
@@ -18,10 +20,31 @@ public class SplitNode<T> implements SplitTree<T> {
         this.left = left;
         this.right = right;
     }
+    
+    @Override
+    public void ballSearch(BallSearchResults<T> results) {
+        double dist = results.getMetric().eval(results.getTarget(), this.center);
+        if (dist < radius + results.getEps()) {
+            this.getLeft().ballSearch(results);
+        }
+        if (dist >= radius - results.getEps()) {
+            this.getRight().ballSearch(results);
+        }
+    }
 
     @Override
-    public void search(SearchAlgorithm<T> searchAlgorithm) {
-        searchAlgorithm.search(this);
+    public void knnSearch(KNNSearchResults<T> results) {
+        Metric<T> metric = results.getMetric();
+        T knnCenter = results.getTarget();
+        double dist = metric.eval(knnCenter, this.center);
+        double eps = results.getRadius();
+        if (dist < radius + eps) {
+            this.getLeft().knnSearch(results);
+            eps = results.getRadius();
+        }
+        if (dist >= radius - eps) {
+            this.getRight().knnSearch(results);
+        }
     }
 
     public T getCenter() {

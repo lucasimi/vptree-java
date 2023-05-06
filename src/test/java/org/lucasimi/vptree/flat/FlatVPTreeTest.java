@@ -11,6 +11,8 @@ import java.util.List;
 import org.junit.Test;
 import org.lucasimi.DatasetGenerator;
 import org.lucasimi.utils.Metric;
+import org.lucasimi.vptree.VPTree;
+import org.lucasimi.vptree.VPTree.TreeType;
 
 public class FlatVPTreeTest {
 
@@ -30,8 +32,9 @@ public class FlatVPTreeTest {
     @Test
     public void testCreateEmpty() {
         List<Integer> dataset = new LinkedList<>();
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
     }
 
@@ -39,8 +42,9 @@ public class FlatVPTreeTest {
     public void testCreateSingleton() {
         List<Integer> dataset = new LinkedList<>();
         dataset.add(1);
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
     }
 
@@ -48,8 +52,9 @@ public class FlatVPTreeTest {
     public void testCreate() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, 10);
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
     }
 
@@ -57,10 +62,11 @@ public class FlatVPTreeTest {
     public void testBallSearchSingleton() {
         List<Integer> dataset = new ArrayList<>(1);
         dataset.add(1);
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .withLeafRadius(5)
                 .withLeafCapacity(10)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(1, 10.0);
         assertTrue(res.contains(1));
@@ -70,10 +76,11 @@ public class FlatVPTreeTest {
     public void testBallSearchRandom() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, size / 10);
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .withLeafRadius(5)
                 .withLeafCapacity(10)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
         testBallSearch(dataset, metric, vpTree, 2.5);
     }
@@ -82,10 +89,11 @@ public class FlatVPTreeTest {
     public void testBallSearchLine() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.linearDataset(size);
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .withLeafRadius(5)
                 .withLeafCapacity(10)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
         testBallSearch(dataset, metric, vpTree, 2.5);
     }
@@ -94,16 +102,17 @@ public class FlatVPTreeTest {
     public void testBallSearchDuplicates() {
         int size = (int) Math.pow(BASE, MAX_POWER);
         List<Integer> dataset = DatasetGenerator.randomDataset(size, 0, 1);
-        FlatVPTree<Integer> vpTree = FlatVPTree.<Integer>newBuilder()
+        VPTree<Integer> vpTree = VPTree.<Integer>newBuilder()
                 .withMetric(metric)
                 .withLeafRadius(5)
                 .withLeafCapacity(10)
+                .withTreeType(TreeType.FLAT)
                 .build(dataset);
         Collection<Integer> res = vpTree.ballSearch(0, 1.5);
         assertEquals(size, res.size());
     }
 
-    private <T> void testBallSearch(Collection<T> dataset, Metric<T> metric, FlatVPTree<T> vpTree, double radius) {
+    private <T> void testBallSearch(Collection<T> dataset, Metric<T> metric, VPTree<T> vpTree, double radius) {
         for (T point : dataset) {
             Collection<T> res = vpTree.ballSearch(point, radius);
             for (T x : dataset) {

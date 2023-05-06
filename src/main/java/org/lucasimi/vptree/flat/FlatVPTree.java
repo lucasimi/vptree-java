@@ -3,13 +3,13 @@ package org.lucasimi.vptree.flat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Random;
 
 import org.lucasimi.utils.Metric;
 import org.lucasimi.utils.Ordered;
 import org.lucasimi.utils.Pivoter;
 import org.lucasimi.vptree.VPTree;
+import org.lucasimi.vptree.search.BallSearchResults;
 
 public class FlatVPTree<T> implements VPTree<T> {
 
@@ -23,19 +23,15 @@ public class FlatVPTree<T> implements VPTree<T> {
 
     private final ArrayList<Ordered<Double, T>> vpArr;
 
-    public static <T> Builder<T> newBuilder() {
-        return new Builder<>();
-    }
-
-    private FlatVPTree(Builder<T> builder, Collection<T> data) {
-        this.metric = builder.metric;
+    public FlatVPTree(Builder<T> builder, Collection<T> data) {
+        this.metric = builder.getMetric();
         this.vpArr = new ArrayList<>(data.size());
-        this.leafCapacity = builder.leafCapacity;
-        this.leafRadius = builder.leafRadius;
+        this.leafCapacity = builder.getLeafCapacity();
+        this.leafRadius = builder.getLeafRadius();
         for (T x : data) {
             this.vpArr.add(new Ordered<>(0.0, x));
         }
-        if (builder.randomPivoting) {
+        if (builder.isRandomPivoting()) {
             buildRand();
         } else {
             buildNoRand();
@@ -44,9 +40,9 @@ public class FlatVPTree<T> implements VPTree<T> {
 
 	@Override
     public Collection<T> ballSearch(T target, double eps) {
-        Collection<T> results = new LinkedList<>();
-        ballSearchRec(target, eps, results, 0, this.vpArr.size());
-        return results;
+        BallSearchResults<T> results = new BallSearchResults<>(this.metric, target, eps);
+        ballSearchRec(results, 0, this.vpArr.size()); 
+        return results.getPoints(); 
     }
 
 	@Override
@@ -119,7 +115,9 @@ public class FlatVPTree<T> implements VPTree<T> {
         buildRandRec(mid, bound);
     }
 
-    private void ballSearchRec(T target, double eps, Collection<T> results, int start, int bound) {
+    private void ballSearchRec(BallSearchResults<T> results, int start, int bound) {
+        double eps = results.getEps();
+        T target = results.getTarget();
         if (bound <= start + this.leafCapacity) {
             for (int i = start; i < bound; i++) {
                 Ordered<Double, T> ord = this.vpArr.get(i);
@@ -148,54 +146,19 @@ public class FlatVPTree<T> implements VPTree<T> {
                     results.add(center);
                 }
                 if (dist < radius + eps) {
-                    ballSearchRec(target, eps, results, start + 1, mid);
+                    ballSearchRec(results, start + 1, mid);
                 }
                 if (dist >= radius - eps) {
-                    ballSearchRec(target, eps, results, mid, bound);
+                    ballSearchRec(results, mid, bound);
                 }
             }
         }
     }
 
-    public static class Builder<T> {
-
-        private Metric<T> metric;
-
-        private int leafCapacity = 1;
-
-        private double leafRadius = 0.0;
-
-        private boolean randomPivoting = true;
-
-        private Builder() {}
-
-        public Builder<T> withMetric(Metric<T> metric) {
-            this.metric = metric;
-            return this;
-        }
-
-        public Builder<T> withLeafCapacity(int leafCapacity) {
-            this.leafCapacity = leafCapacity;
-            return this;
-        }
-
-        public Builder<T> withLeafRadius(double leafRadius) {
-            this.leafRadius = leafRadius;
-            return this;
-        }
-
-        public Builder<T> withRandomPivoting(boolean randomPivoting) {
-            this.randomPivoting = randomPivoting;
-            return this;
-        }
-
-        public FlatVPTree<T> build(Collection<T> data) {
-            if (this.metric == null) {
-                throw new IllegalArgumentException("A metric must be specified");
-            }
-            return new FlatVPTree<>(this, data);
-        }
-
-    }
+	@Override
+	public Collection<T> getCenters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
