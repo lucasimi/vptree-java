@@ -1,6 +1,7 @@
 package org.lucasimi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -11,7 +12,11 @@ public class DatasetGenerator {
     private DatasetGenerator() {
     }
 
-    public static List<Integer> linearDataset(int n) {
+    public <T> Collection<T> empty() {
+        return new ArrayList<>();
+    }
+
+    public static Collection<Integer> linear(int n) {
         List<Integer> dataset = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             dataset.add(i);
@@ -19,7 +24,7 @@ public class DatasetGenerator {
         return dataset;
     }
 
-    public static List<Integer> randomDataset(int size, int min, int bound) {
+    public static Collection<Integer> random(int size, int min, int bound) {
         List<Integer> array = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             array.add(min + rand.nextInt(bound - min));
@@ -27,7 +32,7 @@ public class DatasetGenerator {
         return array;
     }
 
-    public static List<double[]> randomDataset(int size, int dim, double min, double bound) {
+    public static Collection<double[]> random(int size, int dim, double min, double bound) {
         List<double[]> array = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             double[] point = new double[dim];

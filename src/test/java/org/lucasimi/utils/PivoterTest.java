@@ -23,7 +23,7 @@ public class PivoterTest {
         Random rand = new Random();
         for (int k = 0; k < 6; k++) {
             int size = (int) Math.pow(10, k);
-            List<Integer> dataset = DatasetGenerator.linearDataset(size);
+            List<Integer> dataset = new ArrayList<>(DatasetGenerator.linear(size));
             int order = rand.ints(0, dataset.size()).findFirst().getAsInt();
             Pivoter.quickSelect(dataset, 0, dataset.size(), order);
             for (int i = 0; i < order; i++) {
@@ -48,7 +48,7 @@ public class PivoterTest {
     @Test
     public void testMinRandom() {
         for (int i = 0; i < TIMES; i++) {
-            List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
+            List<Integer> array = new ArrayList<>(DatasetGenerator.random(SIZE, 1, SIZE / 2));
             Pivoter.quickSelect(array, 0, array.size(), 0);
             Integer foundMin = array.get(0);
             assertEquals(findMin(array), foundMin);
@@ -58,7 +58,7 @@ public class PivoterTest {
     @Test
     public void testPartitionRandom() {
         for (int i = 0; i < TIMES; i++) {
-            List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
+            List<Integer> array = new ArrayList<>(DatasetGenerator.random(SIZE, 1, SIZE / 2));
             int k = RAND.nextInt(array.size());
             Integer pivot = array.get(k);
             int h = Pivoter.partition(array, 0, array.size(), k);
@@ -75,7 +75,7 @@ public class PivoterTest {
     @Test
     public void testQuickSelectRandom() {
         for (int i = 0; i < TIMES; i++) {
-            List<Integer> array = DatasetGenerator.randomDataset(SIZE, 1, SIZE / 2);
+            List<Integer> array = new ArrayList<>(DatasetGenerator.random(SIZE, 1, SIZE / 2));
             int k = RAND.nextInt(array.size());
             Pivoter.quickSelect(array, 0, array.size(), k);
             Integer pivot = array.get(k);

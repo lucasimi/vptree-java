@@ -39,7 +39,7 @@ public class MaxHeapTest {
     @Test
     public void testMax() {
         MaxHeap<Integer> heap = new MaxHeap<>(10);
-        Collection<Integer> points = DatasetGenerator.linearDataset(20);
+        Collection<Integer> points = DatasetGenerator.linear(20);
         assertTrue(heap.isEmpty());
         heap.addAll(points);
         assertEquals(20, heap.size());
@@ -54,7 +54,7 @@ public class MaxHeapTest {
     @Test
     public void testIdentical() {
         MaxHeap<Integer> heap = new MaxHeap<>(1);
-        Collection<Integer> points = DatasetGenerator.linearDataset(20);
+        Collection<Integer> points = DatasetGenerator.linear(20);
         assertTrue(heap.isEmpty());
         heap.addAll(points);
         assertEquals(20, heap.size());

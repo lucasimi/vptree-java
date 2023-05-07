@@ -178,7 +178,7 @@ public class BenchTest {
     @Test
     public void benchAll() {
         int size = (int) Math.pow(BASE, MAX_POWER);
-        List<double[]> dataset = DatasetGenerator.randomDataset(size, DIMENSIONS, 8.0, 12.0);
+        List<double[]> dataset = new ArrayList<>(DatasetGenerator.random(size, DIMENSIONS, 8.0, 12.0));
         double radius = 1.5 * Math.sqrt(DIMENSIONS);
         int neighbors = (int) (0.001 * dataset.size());
         benchmark(dataset, metric, 0.0, 1);
