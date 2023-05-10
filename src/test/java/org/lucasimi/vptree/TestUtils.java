@@ -1,6 +1,7 @@
 package org.lucasimi.vptree;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +33,7 @@ public class TestUtils {
         for (T point : dataset) {
             Collection<T> res = vpTree.knnSearch(point, neighbors);
             Collection<T> expected = knnSearch(dataset, metric, point, neighbors);
+            assertTrue(res.contains(point));
             assertEquals(new HashSet<>(expected), new HashSet<>(res));
         }
     }
@@ -40,6 +42,7 @@ public class TestUtils {
         for (T point : dataset) {
             Collection<T> res = vpTree.ballSearch(point, radius);
             Collection<T> expected = ballSearch(dataset, metric, point, radius);
+            assertTrue(res.contains(point));
             assertEquals(new HashSet<>(expected), new HashSet<>(res));
         }
     }
