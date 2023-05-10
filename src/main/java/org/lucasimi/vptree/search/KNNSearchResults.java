@@ -1,8 +1,7 @@
 package org.lucasimi.vptree.search;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.lucasimi.utils.MaxHeap;
 import org.lucasimi.utils.Metric;
@@ -51,14 +50,10 @@ public class KNNSearchResults<T> implements SearchResults<T> {
     }
 
     @Override
-    public Collection<T> getPoints() {
-        Set<T> collected = new HashSet<>();
-        while (!this.points.isEmpty()) {
-            this.points.extractMax()
-                    .map(b -> b.getData())
-                    .ifPresent(collected::add);
-        }
-        return collected;
+    public Collection<T> extractPoints() {
+        return this.points.extractAll().stream()
+            .map(Ordered::getData)
+            .collect(Collectors.toList());
     }
 
 	public Metric<T> getMetric() {

@@ -34,6 +34,14 @@ public class MaxHeap<T extends Comparable<T>> {
         }
     }
 
+    public List<T> extractAll() {
+        List<T> elements = new ArrayList<>(this.array.size());
+        while (!this.isEmpty()) {
+            this.extractMax().ifPresent(elements::add);
+        }
+        return elements;
+    }
+
     public void add(T value) {
         this.array.add(value);
         int node = this.array.size() - 1;

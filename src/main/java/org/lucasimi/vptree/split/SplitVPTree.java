@@ -48,14 +48,14 @@ public class SplitVPTree<T> implements VPTree<T> {
     public Collection<T> ballSearch(T target, double eps) {
         BallSearchResults<T> ballSearch = new BallSearchResults<>(this.metric, target, eps);
         this.tree.ballSearch(ballSearch);
-        return ballSearch.getPoints();
+        return ballSearch.extractPoints();
     }
 
     @Override
     public Collection<T> knnSearch(T target, int neighbors) {
         KNNSearchResults<T> results = new KNNSearchResults<>(this.metric, target, neighbors);
         this.tree.knnSearch(results);
-        return results.getPoints();
+        return results.extractPoints();
     }
 
     private void swap(int i, int j) {

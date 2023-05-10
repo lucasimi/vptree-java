@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.lucasimi.utils.Metric;
 
@@ -19,14 +20,14 @@ public class TestUtils {
         return arr.stream()
             .sorted((p, q) -> Double.compare(metric.eval(target, p), metric.eval(target, q)))
             .limit(neighbors)
-            .toList();
+            .collect(Collectors.toList());
     }
 
     public static <T> List<T> ballSearch(Collection<T> dataset, Metric<T> metric, T target, double radius) {
         List<T> arr = new ArrayList<>(dataset);
         return arr.stream()
             .filter(p -> metric.eval(target, p) <= radius)
-            .toList();
+            .collect(Collectors.toList());
     }
 
     public static <T> void testKNNSearch(Collection<T> dataset, Metric<T> metric, VPTree<T> vpTree, int neighbors) {

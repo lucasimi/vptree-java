@@ -3,7 +3,11 @@ package org.lucasimi.utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 import org.lucasimi.DatasetGenerator;
@@ -58,6 +62,28 @@ public class MaxHeapTest {
         assertTrue(heap.isEmpty());
         heap.addAll(points);
         assertEquals(20, heap.size());
+    }
+
+    @Test 
+    public void testRandom() {
+        Random rand = new Random();
+        int size = 100;
+        MaxHeap<Integer> heap = new MaxHeap<>(size);
+        List<Integer> data = new ArrayList<>(10 * size);
+        for (int i = 0; i < (10 * size); i++) {
+            Integer val = rand.nextInt(size);
+            heap.add(val);
+            data.add(val);
+        }
+        assertEquals(10 * size, heap.size());
+        Integer max = Integer.MAX_VALUE;
+        for (int i = 0; i < (10 * size); i++) {
+            assertEquals(10 * size - i, heap.size());
+            Integer val = heap.extractMax().get();
+            assertTrue(val <= max);
+            max = val;
+        }
+        assertEquals(0, heap.size());
     }
 
 }

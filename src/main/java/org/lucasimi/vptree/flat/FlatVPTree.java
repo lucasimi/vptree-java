@@ -42,7 +42,7 @@ public class FlatVPTree<T> implements VPTree<T> {
     public Collection<T> ballSearch(T target, double eps) {
         BallSearchResults<T> results = new BallSearchResults<>(this.metric, target, eps);
         ballSearchRec(results, 0, this.vpArr.size()); 
-        return results.getPoints(); 
+        return results.extractPoints(); 
     }
 
 	@Override

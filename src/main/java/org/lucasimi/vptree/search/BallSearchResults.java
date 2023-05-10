@@ -43,7 +43,7 @@ public class BallSearchResults<T> implements SearchResults<T> {
 	}
 
     @Override
-    public Collection<T> getPoints() {
+    public Collection<T> extractPoints() {
         return this.points;
     }
 

@@ -4,6 +4,6 @@ import java.util.Collection;
 
 public interface SearchResults<T> {
 
-    public Collection<T> getPoints();
+    public Collection<T> extractPoints();
 
 }
