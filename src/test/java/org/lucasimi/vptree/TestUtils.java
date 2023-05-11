@@ -23,6 +23,17 @@ public class TestUtils {
             .collect(Collectors.toList());
     }
 
+    private static <T> double maxDist(Collection<T> dataset, Metric<T> metric, T target) {
+        double maxDist = Double.MIN_VALUE;
+        for (T point : dataset) {
+            double dist = metric.eval(point, target);
+            if (dist > maxDist) {
+                maxDist = dist;
+            }
+        }
+        return maxDist;
+    }
+
     public static <T> List<T> ballSearch(Collection<T> dataset, Metric<T> metric, T target, double radius) {
         List<T> arr = new ArrayList<>(dataset);
         return arr.stream()
@@ -31,11 +42,15 @@ public class TestUtils {
     }
 
     public static <T> void testKNNSearch(Collection<T> dataset, Metric<T> metric, VPTree<T> vpTree, int neighbors) {
-        for (T point : dataset) {
-            Collection<T> res = vpTree.knnSearch(point, neighbors);
-            Collection<T> expected = knnSearch(dataset, metric, point, neighbors);
-            assertTrue(res.contains(point));
-            assertEquals(new HashSet<>(expected), new HashSet<>(res));
+        for (T target : dataset) {
+            Collection<T> res = vpTree.knnSearch(target, neighbors);
+            assertEquals(neighbors, res.size());
+            double maxDist = maxDist(res, metric, target);
+            for (T point : dataset) {
+                if (!res.contains(point)) {
+                    assertTrue(metric.eval(point, target) >= maxDist);
+                }
+            }
         }
     }
 

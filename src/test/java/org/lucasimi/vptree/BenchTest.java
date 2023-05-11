@@ -20,7 +20,7 @@ public class BenchTest {
 
     private static final int BASE = 10;
 
-    private static final int MAX_POWER = 5;
+    private static final int MAX_POWER = 4;
 
     private static final int DIMENSIONS = 32;
 

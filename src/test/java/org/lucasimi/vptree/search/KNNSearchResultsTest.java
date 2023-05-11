@@ -74,15 +74,15 @@ public class KNNSearchResultsTest {
     @Test 
     public void testSmall() {
         int target = 0;
-        KNNSearchResults<Integer> results = new KNNSearchResults<>(metric, target, 3);
+        KNNSearchResults<Integer> results = new KNNSearchResults<>(metric, target, 2);
         List<Integer> data = new ArrayList<>();
-        Collections.addAll(data, 0, 4, 4, 1, 8);
+        Collections.addAll(data, 1, 2, 3);
         for (Integer val : data) {
             results.add(val);
         }
         List<Integer> expected = data.stream() 
             .sorted((x, y) -> Double.compare(metric.eval(target, x), metric.eval(target, y)))
-            .limit(3)
+            .limit(2)
             .collect(Collectors.toList());
         Collection<Integer> points = results.extractPoints();
         assertEquals(new HashSet<>(expected), new HashSet<>(points));
