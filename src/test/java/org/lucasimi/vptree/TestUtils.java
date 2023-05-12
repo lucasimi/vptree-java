@@ -16,41 +16,33 @@ public class TestUtils {
     private TestUtils() {}
 
     public static <T> List<T> knnSearch(Collection<T> dataset, Metric<T> metric, T target, int neighbors) {
-        List<T> arr = new ArrayList<>(dataset);
-        return arr.stream()
+        return dataset.stream()
             .sorted((p, q) -> Double.compare(metric.eval(target, p), metric.eval(target, q)))
             .limit(neighbors)
             .collect(Collectors.toList());
     }
 
     private static <T> double maxDist(Collection<T> dataset, Metric<T> metric, T target) {
-        double maxDist = Double.MIN_VALUE;
-        for (T point : dataset) {
-            double dist = metric.eval(point, target);
-            if (dist > maxDist) {
-                maxDist = dist;
-            }
-        }
-        return maxDist;
+        return dataset.stream()
+            .mapToDouble(p -> metric.eval(target, p))
+            .max()
+            .orElse(Double.POSITIVE_INFINITY);
     }
 
     public static <T> List<T> ballSearch(Collection<T> dataset, Metric<T> metric, T target, double radius) {
-        List<T> arr = new ArrayList<>(dataset);
-        return arr.stream()
+        return dataset.stream()
             .filter(p -> metric.eval(target, p) <= radius)
             .collect(Collectors.toList());
     }
 
     public static <T> void testKNNSearch(Collection<T> dataset, Metric<T> metric, VPTree<T> vpTree, int neighbors) {
         for (T target : dataset) {
-            Collection<T> res = vpTree.knnSearch(target, neighbors);
-            assertEquals(neighbors, res.size());
-            double maxDist = maxDist(res, metric, target);
-            for (T point : dataset) {
-                if (!res.contains(point)) {
-                    assertTrue(metric.eval(point, target) >= maxDist);
-                }
-            }
+            Collection<T> results = vpTree.knnSearch(target, neighbors);
+            Collection<T> expected = knnSearch(dataset, metric, target, neighbors);
+            double maxDist = maxDist(results, metric, target);
+            double maxDistExpected = maxDist(expected, metric, target);
+            assertEquals(neighbors, results.size());
+            assertEquals(maxDistExpected, maxDist, 0.0000001);
         }
     }
 
