@@ -93,6 +93,7 @@ public class VPTreeBenchSuite {
                 .withMetric(METRIC)
                 .withLeafRadius(1.5 * Math.sqrt(DIMENSIONS))
                 .withLeafCapacity((int) (0.001 * dataset.size()))
+                .withRandomPivoting(false)
                 .withTreeType(getTreeType());
         VPTree<double[]> vpTree = benchBuild(dataset, builder, sample.size());
         benchBallSearch(vpTree, builder, sample);

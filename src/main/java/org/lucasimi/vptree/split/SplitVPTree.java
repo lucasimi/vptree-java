@@ -30,18 +30,14 @@ public class SplitVPTree<T> implements VPTree<T> {
 
     public SplitVPTree(Builder<T> builder, Collection<T> data) {
         this.metric = builder.getMetric();
+        this.leafRadius = builder.getLeafRadius();
+        this.leafCapacity = builder.getLeafCapacity();
+        this.centers = new ArrayList<>(data.size());
         this.dataset = new ArrayList<>(data.size());
         for (T x : data) {
             this.dataset.add(new Ordered<>(0.0, x));
         }
-        this.leafRadius = builder.getLeafRadius();
-        this.leafCapacity = builder.getLeafCapacity();
-        this.centers = new ArrayList<>(data.size());
-        if (builder.isRandomPivoting()) {
-            this.tree = buildRandRec(0, this.dataset.size());
-        } else {
-            this.tree = buildUpdateRec(0, this.dataset.size());
-        }
+        this.tree = buildUpd(0, this.dataset.size(), true);
     }
 
     @Override
@@ -58,6 +54,14 @@ public class SplitVPTree<T> implements VPTree<T> {
         return results.extractPoints();
     }
 
+    private SplitTree<T> buildLeaf(int start, int bound) {
+        List<T> points = new ArrayList<>(bound - start);
+        for (int i = start; i < bound; i++) {
+            points.add(this.dataset.get(i).getData());
+        }
+        return new SplitLeaf<>(points);
+    }
+
     private void swap(int i, int j) {
         if (i == j) {
             return;
@@ -69,105 +73,42 @@ public class SplitVPTree<T> implements VPTree<T> {
         }
     }
 
-    private static int getMid(int start, int bound) {
-        return (start + bound) / 2;
-    }
-
-    private SplitTree<T> buildLeaf(int start, int bound) {
-        List<T> points = new ArrayList<>(bound - start);
-        for (int i = start; i < bound; i++) {
-            points.add(this.dataset.get(i).getData());
+    private void updatePivot(int start, int bound) {
+        int pivot = start + RAND.nextInt(bound - start);
+        swap(pivot, start);
+        T vp = this.dataset.get(start).getData();
+        for (int j = start + 1; j < bound; j++) {
+            Ordered<Double, T> point = this.dataset.get(j);
+            T pointData = point.getData();
+            point.setOrder(this.metric.eval(vp, pointData));
         }
-        return new SplitLeaf<>(points);
     }
 
-    private SplitTree<T> buildRandRec(int start, int bound) {
+    private SplitTree<T> buildUpd(int start, int bound, boolean update) {
         if (bound - start <= this.leafCapacity) {
             for (int i = start; i < bound; i++) {
                 this.centers.add(this.dataset.get(i).getData());
             }
             return buildLeaf(start, bound);
         } else {
-            int mid = getMid(start, bound);
-            int pivot = start + RAND.nextInt(bound - start);
-            swap(pivot, start);
-            Ordered<Double, T> vpOrd = this.dataset.get(start);
-            T vp = vpOrd.getData();
-            updateDist(vp, start + 1, bound);
-            double radius = process(start, bound, mid);
+            int split = (start + bound) / 2;
+            if (update) {
+                updatePivot(start, bound);
+            }
+            Pivoter.quickSelect(this.dataset, start + 1, bound, split);
+            double radius = this.dataset.get(split).getOrder();
+            T vp = this.dataset.get(start).getData();
             SplitTree<T> leftTree;
             SplitTree<T> rightTree;
             if (radius < this.leafRadius) {
                 this.centers.add(vp);
-                leftTree = buildLeaf(start, mid);
+                leftTree = buildLeaf(start, split);
             } else {
-                leftTree = buildRandRec(start, mid);
+                leftTree = buildUpd(start, split, false);
             }
-            rightTree = buildRandRec(mid, bound);
+            rightTree = buildUpd(split, bound, true);
             return new SplitNode<>(vp, radius, leftTree, rightTree);
         }
-    }
-
-    private SplitTree<T> buildUpdateRec(int start, int bound) {
-        if (bound - start <= this.leafCapacity) {
-            for (int i = start; i < bound; i++) {
-                this.centers.add(this.dataset.get(i).getData());
-            }
-            return buildLeaf(start, bound);
-        } else {
-            int mid = getMid(start, bound);
-            Ordered<Double, T> vpOrd = this.dataset.get(start);
-            T vp = vpOrd.getData();
-            updateDist(vp, start + 1, bound);
-            double radius = process(start, bound, mid);
-            SplitTree<T> leftTree;
-            SplitTree<T> rightTree;
-            if (radius < this.leafRadius) {
-                this.centers.add(vpOrd.getData());
-                leftTree = buildLeaf(start, mid);
-            } else {
-                leftTree = buildNoUpdateRec(start, mid);
-            }
-            rightTree = buildUpdateRec(mid, bound);
-            return new SplitNode<>(vpOrd.getData(), radius, leftTree, rightTree);
-        }
-    }
-
-    private SplitTree<T> buildNoUpdateRec(int start, int bound) {
-        if (bound - start <= this.leafCapacity) {
-            for (int i = start; i < bound; i++) {
-                this.centers.add(this.dataset.get(i).getData());
-            }
-            return buildLeaf(start, bound);
-        } else {
-            int mid = getMid(start, bound);
-            Ordered<Double, T> vpOrd = this.dataset.get(start);
-            double radius = process(start, bound, mid);
-            SplitTree<T> leftTree;
-            SplitTree<T> rightTree;
-            if (radius < this.leafRadius) {
-                this.centers.add(vpOrd.getData());
-                leftTree = buildLeaf(start, mid);
-            } else {
-                leftTree = buildNoUpdateRec(start, mid);
-            }
-            rightTree = buildUpdateRec(mid, bound);
-            return new SplitNode<>(vpOrd.getData(), radius, leftTree, rightTree);
-        }
-    }
-
-    private void updateDist(T center, int start, int bound) {
-        for (int j = start; j < bound; j++) {
-            Ordered<Double, T> wo = this.dataset.get(j);
-            wo.setOrder(this.metric.eval(center, wo.getData()));
-        }
-    }
-
-    private double process(int start, int bound, int mid) {
-        Pivoter.quickSelect(this.dataset, start + 1, bound, mid);
-        Ordered<Double, T> furthest = this.dataset.get(mid);
-        double radius = furthest.getOrder();
-        return radius;
     }
 
     @Override
