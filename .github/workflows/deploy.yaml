@@ -17,7 +17,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Publish package
+      - name: Publish snapshot package
         run: mvn --batch-mode --update-snapshots clean deploy
+        env:
+          PACKAGES_WRITE_PAT: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag and release package
+        run: mvn --batch-mode release:clean release:prepare release:perform
         env:
           PACKAGES_WRITE_PAT: ${{ secrets.GITHUB_TOKEN }}
