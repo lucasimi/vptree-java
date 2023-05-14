@@ -6,7 +6,7 @@ on:
       - v*
 
 jobs:
-  deploy-job:
+  release-job:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -18,7 +18,7 @@ jobs:
           distribution: 'adopt'
       - name: Remove snapshot from version
         run: mvn --batch-mode versions:set -DremoveSnapshot
-      - name: Publish snapshot package
-        run: mvn --batch-mode --update-snapshots clean deploy
+      - name: Publish release package
+        run: mvn --batch-mode clean deploy
         env:
           PACKAGES_WRITE_PAT: ${{ secrets.GITHUB_TOKEN }}
