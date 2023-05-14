@@ -18,6 +18,10 @@ jobs:
           distribution: 'adopt'
       - name: Remove snapshot from version
         run: mvn --batch-mode versions:set -DremoveSnapshot
+      - name: Fetch pom version 
+        run: echo "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $POM_VERSION
+      - name: Check tag version 
+        run: if [ v$POM_VERSION -eq {{github.ref_name}} ]; then return 0; else return 1; fi
       - name: Publish release package
         run: mvn --batch-mode clean deploy
         env:
