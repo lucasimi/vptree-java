@@ -1,10 +1,9 @@
-name: deploy
+name: release
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    tags:
+      - v*
 
 jobs:
   deploy-job:
@@ -17,6 +16,8 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - name: Remove snapshot from version
+        run: mvn --batch-mode versions:set -DremoveSnapshot
       - name: Publish snapshot package
         run: mvn --batch-mode --update-snapshots clean deploy
         env:
