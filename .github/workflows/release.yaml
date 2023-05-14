@@ -20,9 +20,8 @@ jobs:
         run: mvn --batch-mode versions:set -DremoveSnapshot
       - name: Fetch pom version 
         run: echo "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $env:POM_VERSION
-      - name: Check tag version 
-        run: if [ v$env:POM_VERSION -eq ${{github.ref_name}} ]; then return 0; else return 1; fi
       - name: Publish release package
+        if: ${{ env.POM_VERSION == github.ref_name }} 
         run: mvn --batch-mode clean deploy
         env:
           PACKAGES_WRITE_PAT: ${{ secrets.GITHUB_TOKEN }}
