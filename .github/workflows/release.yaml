@@ -20,6 +20,11 @@ jobs:
         run: mvn --batch-mode versions:set -DremoveSnapshot
       - name: Fetch pom version 
         run: echo "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $env:POM_VERSION
+      - name: Check pom version
+        if: ${{ env.POM_VERSION != github.ref_name }} 
+        run: | 
+          echo "::error The pom version differs from the tag"
+          exit 1
       - name: Publish release package
         if: ${{ env.POM_VERSION == github.ref_name }} 
         run: mvn --batch-mode clean deploy
