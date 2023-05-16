@@ -19,14 +19,15 @@ jobs:
       - name: Remove snapshot from version
         run: mvn --batch-mode versions:set -DremoveSnapshot
       - name: Fetch pom version 
-        run: echo "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $env:POM_VERSION
+        run: echo "pom_version=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
       - name: Check pom version
-        if: ${{ env.POM_VERSION != github.ref_name }} 
+        if: ${{ env.pom_version != github.ref_name }} 
         run: | 
-          echo "::error The pom version differs from the tag"
+          echo "::error The pom version ${{ env.pom_version }} differs from the tag ${{ github.ref_name }}"
           exit 1
       - name: Publish release package
-        if: ${{ env.POM_VERSION == github.ref_name }} 
+        if: ${{ env.pom_version == github.ref_name }} 
         run: mvn --batch-mode clean deploy
         env:
           PACKAGES_WRITE_PAT: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGES_READ_PAT: ${{ secrets.GITHUB_TOKEN }}
