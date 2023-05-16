@@ -1,4 +1,4 @@
-package org.lucasimi.utils;
+package io.github.lucasimi.utils;
 
 public class Ordered<S extends Comparable<S>, T> implements Comparable<Ordered<S, T>> {
 

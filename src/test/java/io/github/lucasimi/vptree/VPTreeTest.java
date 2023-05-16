@@ -1,4 +1,4 @@
-package org.lucasimi.vptree;
+package io.github.lucasimi.vptree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -9,8 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.lucasimi.DatasetGenerator;
-import org.lucasimi.utils.Metric;
+
+import io.github.lucasimi.DatasetGenerator;
+import io.github.lucasimi.utils.Metric;
 
 public class VPTreeTest {
 

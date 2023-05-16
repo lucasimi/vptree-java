@@ -1,4 +1,4 @@
-package org.lucasimi.vptree;
+package io.github.lucasimi.vptree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,8 +8,9 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import org.junit.Test;
-import org.lucasimi.DatasetGenerator;
-import org.lucasimi.utils.Metric;
+
+import io.github.lucasimi.DatasetGenerator;
+import io.github.lucasimi.utils.Metric;
 
 public class BenchTest {
 

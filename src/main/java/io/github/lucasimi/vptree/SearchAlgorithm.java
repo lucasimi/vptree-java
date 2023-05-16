@@ -1,4 +1,4 @@
-package org.lucasimi.vptree;
+package io.github.lucasimi.vptree;
 
 import java.util.Collection;
 

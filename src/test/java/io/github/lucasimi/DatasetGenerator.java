@@ -1,4 +1,4 @@
-package org.lucasimi;
+package io.github.lucasimi;
 
 import java.util.ArrayList;
 import java.util.List;

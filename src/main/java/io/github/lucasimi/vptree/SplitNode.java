@@ -1,4 +1,4 @@
-package org.lucasimi.vptree;
+package io.github.lucasimi.vptree;
 
 public class SplitNode<T> implements SplitTree<T> {
 

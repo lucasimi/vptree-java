@@ -1,4 +1,4 @@
-package org.lucasimi.vptree;
+package io.github.lucasimi.vptree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.lucasimi.utils.MaxHeap;
-import org.lucasimi.utils.Metric;
-import org.lucasimi.utils.Ordered;
-import org.lucasimi.utils.Pivoter;
+import io.github.lucasimi.utils.MaxHeap;
+import io.github.lucasimi.utils.Metric;
+import io.github.lucasimi.utils.Ordered;
+import io.github.lucasimi.utils.Pivoter;
 
 public class VPTree<T> {
 

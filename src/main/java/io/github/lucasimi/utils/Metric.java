@@ -1,4 +1,4 @@
-package org.lucasimi.utils;
+package io.github.lucasimi.utils;
 
 public interface Metric<T> {
 
